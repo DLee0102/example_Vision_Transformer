@@ -103,7 +103,7 @@ class Attention(nn.Module):
         self.num_heads = num_heads
         head_dim = dim // num_heads
         self.scale = qk_scale or head_dim ** -0.5      # 根号d，缩放因子
-        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
+        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)   # 不需要偏置（DL）
         self.attn_drop = nn.Dropout(attn_drop_ratio)
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop_ratio)
@@ -115,7 +115,7 @@ class Attention(nn.Module):
         # qkv(): -> [batch_size, num_patches + 1, 3 * total_embed_dim]
         # reshape: -> [batch_size, num_patches + 1, 3, num_heads, embed_dim_per_head]
         # permute: -> [3, batch_size, num_heads, num_patches + 1, embed_dim_per_head]
-        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
+        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)  # // 取整除
         # [batch_size, num_heads, num_patches + 1, embed_dim_per_head]
         q, k, v = qkv[0], qkv[1], qkv[2]  # make torchscript happy (cannot use tensor as tuple)
 
